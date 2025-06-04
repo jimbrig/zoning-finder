@@ -22,28 +22,36 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
   const [bounds, setBounds] = useState<[[number, number], [number, number]] | null>(null);
 
-  // Helper function to extract coordinates from any GeoJSON geometry
+  // Helper function to extract coordinates from any GeoJSON geometry using iteration
   const extractCoordinates = (geometry: any): number[][] => {
     if (!geometry || !geometry.type || !geometry.coordinates) {
       return [];
     }
 
-    switch (geometry.type) {
-      case 'Point':
-        return [geometry.coordinates];
-      case 'LineString':
-        return geometry.coordinates;
-      case 'Polygon':
-        return geometry.coordinates.flat();
-      case 'MultiPoint':
-        return geometry.coordinates;
-      case 'MultiLineString':
-        return geometry.coordinates.flat();
-      case 'MultiPolygon':
-        return geometry.coordinates.flat(2);
-      default:
-        return [];
+    const coordinates: number[][] = [];
+    const stack = [geometry.coordinates];
+
+    while (stack.length > 0) {
+      const current = stack.pop();
+
+      if (!Array.isArray(current)) {
+        continue;
+      }
+
+      // Check if we've found a coordinate pair
+      if (current.length === 2 && 
+          typeof current[0] === 'number' && 
+          typeof current[1] === 'number') {
+        coordinates.push(current);
+      } else {
+        // Add array items to stack in reverse order to maintain original order
+        for (let i = current.length - 1; i >= 0; i--) {
+          stack.push(current[i]);
+        }
+      }
     }
+
+    return coordinates;
   };
 
   // Helper function to validate coordinate
