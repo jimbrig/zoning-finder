@@ -21,76 +21,63 @@ interface MapPreviewProps {
 const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
   const [bounds, setBounds] = useState<[[number, number], [number, number]] | null>(null);
-
-  // Helper function to extract coordinates from any GeoJSON geometry using iteration
-  const extractCoordinates = (geometry: any): number[][] => {
-    if (!geometry || !geometry.type || !geometry.coordinates) {
-      return [];
-    }
-
-    const coordinates: number[][] = [];
-    const stack = [geometry.coordinates];
-
-    while (stack.length > 0) {
-      const current = stack.pop();
-
-      if (!Array.isArray(current)) {
-        continue;
-      }
-
-      // Check if we've found a coordinate pair
-      if (current.length === 2 && 
-          typeof current[0] === 'number' && 
-          typeof current[1] === 'number') {
-        coordinates.push(current);
-      } else {
-        // Add array items to stack in reverse order to maintain original order
-        for (let i = current.length - 1; i >= 0; i--) {
-          stack.push(current[i]);
-        }
-      }
-    }
-
-    return coordinates;
-  };
-
-  // Helper function to validate coordinate
-  const isValidCoordinate = (coord: number[]): boolean => {
-    return coord.length >= 2 &&
-           !isNaN(coord[0]) && !isNaN(coord[1]) &&
-           isFinite(coord[0]) && isFinite(coord[1]) &&
-           coord[0] >= -180 && coord[0] <= 180 &&
-           coord[1] >= -90 && coord[1] <= 90;
-  };
+  const [zoningDistricts, setZoningDistricts] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGeoJson = async () => {
       try {
-        const queryUrl = `${url}/0/query?where=1%3D1&outFields=*&f=geojson&returnGeometry=true`;
+        // Match R query parameters
+        const queryParams = new URLSearchParams({
+          where: '1=1',
+          outFields: '*',
+          f: 'geojson',
+          returnGeometry: 'true'
+        });
+        
+        const queryUrl = `${url}/0/query?${queryParams}`;
         const response = await fetch(queryUrl);
         const data = await response.json();
+        
+        if (!data || !data.features) {
+          throw new Error('Invalid GeoJSON data received');
+        }
+
         setGeoJsonData(data);
 
-        // Calculate bounds from features
-        if (data.features && data.features.length > 0) {
-          let validCoordinates: number[][] = [];
+        // Extract unique zoning districts for the legend
+        const districts = [...new Set(
+          data.features
+            .map((f: any) => f.properties?.ZONING_DISTRICT || f.properties?.zoning_district)
+            .filter(Boolean)
+        )];
+        setZoningDistricts(districts);
 
-          // Extract and validate coordinates from all features
-          data.features.forEach((feature: any) => {
-            if (feature.geometry) {
-              const coords = extractCoordinates(feature.geometry);
-              validCoordinates.push(...coords.filter(isValidCoordinate));
-            }
+        // Calculate bounds from features
+        if (data.features.length > 0) {
+          const coordinates = data.features.flatMap((feature: any) => {
+            if (!feature.geometry || !feature.geometry.coordinates) return [];
+            
+            // Handle both Polygon and MultiPolygon
+            const coords = feature.geometry.type === 'MultiPolygon' 
+              ? feature.geometry.coordinates.flat(1)
+              : feature.geometry.coordinates.flat();
+            
+            return coords.filter((coord: any) => 
+              Array.isArray(coord) && 
+              coord.length === 2 &&
+              !isNaN(coord[0]) && 
+              !isNaN(coord[1])
+            );
           });
 
-          // Only set bounds if we have valid coordinates
-          if (validCoordinates.length > 0) {
-            const minLat = Math.min(...validCoordinates.map(c => c[1]));
-            const maxLat = Math.max(...validCoordinates.map(c => c[1]));
-            const minLng = Math.min(...validCoordinates.map(c => c[0]));
-            const maxLng = Math.max(...validCoordinates.map(c => c[0]));
-
-            setBounds([[minLat, minLng], [maxLat, maxLng]]);
+          if (coordinates.length > 0) {
+            const lats = coordinates.map((c: number[]) => c[1]);
+            const lngs = coordinates.map((c: number[]) => c[0]);
+            
+            setBounds([
+              [Math.min(...lats), Math.min(...lngs)],
+              [Math.max(...lats), Math.max(...lngs)]
+            ]);
           }
         }
       } catch (error) {
@@ -101,6 +88,16 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
     fetchGeoJson();
   }, [url]);
 
+  const getColor = (district: string) => {
+    // Generate a consistent color based on the district name
+    let hash = 0;
+    for (let i = 0; i < district.length; i++) {
+      hash = district.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const hue = hash % 360;
+    return `hsl(${hue}, 70%, 50%)`;
+  };
+
   if (!bounds) {
     return (
       <div className="w-full h-[400px] bg-gray-100 rounded-lg flex items-center justify-center">
@@ -110,27 +107,51 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
   }
 
   return (
-    <MapContainer
-      bounds={bounds}
-      className="w-full h-[400px] rounded-lg z-0"
-      style={{ background: '#f8f9fa' }}
-    >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      {geoJsonData && (
-        <GeoJSON
-          data={geoJsonData}
-          style={{
-            fillColor: '#3B82F6',
-            fillOpacity: 0.3,
-            color: '#2563EB',
-            weight: 2
-          }}
+    <div className="relative">
+      <MapContainer
+        bounds={bounds}
+        className="w-full h-[400px] rounded-lg z-0"
+        style={{ background: '#f8f9fa' }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {geoJsonData && (
+          <GeoJSON
+            data={geoJsonData}
+            style={(feature) => {
+              const district = feature?.properties?.ZONING_DISTRICT || 
+                             feature?.properties?.zoning_district || 
+                             'Unknown';
+              return {
+                fillColor: getColor(district),
+                fillOpacity: 0.5,
+                color: 'black',
+                weight: 1
+              };
+            }}
+          />
+        )}
+      </MapContainer>
+      
+      {zoningDistricts.length > 0 && (
+        <div className="absolute bottom-4 right-4 bg-white p-2 rounded shadow-md z-[1000]">
+          <h4 className="text-sm font-semibold mb-1">Zoning Districts</h4>
+          <div className="space-y-1">
+            {zoningDistricts.map((district) => (
+              <div key={district} className="flex items-center text-xs">
+                <div 
+                  className="w-4 h-4 mr-2 rounded"
+                  style={{ backgroundColor: getColor(district) }}
+                />
+                {district}
+              </div>
+            ))}
+          </div>
+        </div>
       )}
-    </MapContainer>
+    </div>
   );
 };
 

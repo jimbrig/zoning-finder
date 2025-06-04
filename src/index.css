@@ -9,3 +9,8 @@
 .leaflet-control {
   z-index: 0;
 }
+
+/* Ensure legend appears above map */
+.leaflet-control-container {
+  z-index: 1000;
+}
