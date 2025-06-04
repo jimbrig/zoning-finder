@@ -57,10 +57,10 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
           const coordinates = data.features.flatMap((feature: any) => {
             if (!feature.geometry || !feature.geometry.coordinates) return [];
             
-            // Handle both Polygon and MultiPolygon
+            // Handle both Polygon and MultiPolygon with proper flattening
             const coords = feature.geometry.type === 'MultiPolygon' 
-              ? feature.geometry.coordinates.flat(1)
-              : feature.geometry.coordinates.flat();
+              ? feature.geometry.coordinates.flat(Infinity)
+              : feature.geometry.coordinates.flat(Infinity);
             
             return coords.filter((coord: any) => 
               Array.isArray(coord) && 
