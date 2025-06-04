@@ -7,7 +7,7 @@ import { Icon } from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-let DefaultIcon = Icon.Default.prototype;
+// Set up the default icon for Leaflet
 Icon.Default.imagePath = '';
 Icon.Default.mergeOptions({
   iconUrl: icon,
