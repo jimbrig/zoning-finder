@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Map, History, HelpCircle, GitHub } from 'lucide-react';
+import { Map, History, HelpCircle, Github as GitHub } from 'lucide-react';
 import SearchPage from './pages/SearchPage';
 import HelpPage from './pages/HelpPage';
 import HistoryPage from './pages/HistoryPage';
