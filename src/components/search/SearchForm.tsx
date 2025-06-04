@@ -7,9 +7,9 @@ import { statesList } from '../../data/providers';
 const SearchForm: React.FC = () => {
   const { startSearch, searchStatus, clearResults } = useAppContext();
   const [state, setState] = useState<string>('');
-  const [location, setLocation] = useState<string>('');
+  const [county, setCounty] = useState<string>('');
   const [stateError, setStateError] = useState<string>('');
-  const [locationError, setLocationError] = useState<string>('');
+  const [countyError, setCountyError] = useState<string>('');
   const [filteredStates, setFilteredStates] = useState<string[]>([]);
   const [showStateDropdown, setShowStateDropdown] = useState<boolean>(false);
 
@@ -17,7 +17,7 @@ const SearchForm: React.FC = () => {
     if (state.trim() === '') {
       setFilteredStates([]);
     } else {
-      const filtered = statesList.filter((s: string) => 
+      const filtered = statesList.filter(s => 
         s.toLowerCase().includes(state.toLowerCase())
       );
       setFilteredStates(filtered);
@@ -43,18 +43,18 @@ const SearchForm: React.FC = () => {
       setStateError('');
     }
     
-    if (!location.trim()) {
-      setLocationError('City/County/Municipality is required');
+    if (!county.trim()) {
+      setCountyError('County is required');
       hasError = true;
     } else {
-      setLocationError('');
+      setCountyError('');
     }
     
     if (hasError) return;
     
     const params: SearchParams = {
       state: state.trim(),
-      location: location.trim()
+      county: county.trim()
     };
     
     startSearch(params);
@@ -62,9 +62,9 @@ const SearchForm: React.FC = () => {
 
   const handleClear = () => {
     setState('');
-    setLocation('');
+    setCounty('');
     setStateError('');
-    setLocationError('');
+    setCountyError('');
     clearResults();
   };
 
@@ -126,24 +126,24 @@ const SearchForm: React.FC = () => {
         </div>
         
         <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
-            City/County/Municipality
+          <label htmlFor="county" className="block text-sm font-medium text-gray-700 mb-1">
+            County
           </label>
           <input
             type="text"
-            id="location"
-            value={location}
+            id="county"
+            value={county}
             onChange={(e) => {
-              setLocation(e.target.value);
-              setLocationError('');
+              setCounty(e.target.value);
+              setCountyError('');
             }}
             disabled={isSearching}
             className={`w-full p-3 border rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all ${
-              locationError ? 'border-error-500' : 'border-gray-300'
+              countyError ? 'border-error-500' : 'border-gray-300'
             }`}
-            placeholder="Enter city, county, or municipality name"
+            placeholder="Enter county name"
           />
-          {locationError && <p className="mt-1 text-sm text-error-500">{locationError}</p>}
+          {countyError && <p className="mt-1 text-sm text-error-500">{countyError}</p>}
         </div>
         
         <div className="flex space-x-4 pt-2">

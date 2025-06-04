@@ -8,7 +8,7 @@ import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 let DefaultIcon = Icon.Default.prototype;
-Icon.Default.imagePath = '';
+DefaultIcon.imagePath = '';
 Icon.Default.mergeOptions({
   iconUrl: icon,
   shadowUrl: iconShadow
@@ -53,13 +53,12 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
 
         setGeoJsonData(data);
 
-        // Extract unique zoning districts and ensure they're typed as strings
+        // Extract unique zoning districts
         const districts = [...new Set(
           data.features
             .map((f: any) => f.properties?.ZONING_DISTRICT || f.properties?.zoning_district)
             .filter(Boolean)
-        )] as string[];
-        
+        )];
         setZoningDistricts(districts);
 
         // Calculate bounds

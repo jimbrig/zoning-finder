@@ -21,7 +21,7 @@ const SearchResults: React.FC = () => {
           </div>
         </div>
         <h3 className="text-xl font-semibold text-gray-800 mb-2">Searching for Zoning Districts</h3>
-        <p className="text-gray-600 mb-2">Looking for ArcGIS URLs in {currentSearch?.location}, {currentSearch?.state}</p>
+        <p className="text-gray-600 mb-2">Looking for ArcGIS URLs in {currentSearch?.county}, {currentSearch?.state}</p>
         <p className="text-sm text-gray-500">This may take a moment as we search multiple sources...</p>
       </div>
     );
@@ -45,10 +45,10 @@ const SearchResults: React.FC = () => {
           <Info className="h-12 w-12 text-primary-400 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-800 mb-2">No Results Found</h3>
           <p className="text-gray-600 mb-4">
-            We couldn't find any zoning district URLs for {currentSearch?.location}, {currentSearch?.state}.
+            We couldn't find any zoning district URLs for {currentSearch?.county}, {currentSearch?.state}.
           </p>
           <p className="text-sm text-gray-500">
-            Try checking the spelling or searching for a different location.
+            Try checking the spelling or searching for a different county.
           </p>
         </div>
       </div>
@@ -58,7 +58,7 @@ const SearchResults: React.FC = () => {
   const handleShare = async (result: SearchResult) => {
     try {
       await navigator.share({
-        title: `Zoning Districts - ${currentSearch?.location}, ${currentSearch?.state}`,
+        title: `Zoning Districts - ${currentSearch?.county}, ${currentSearch?.state}`,
         text: `ArcGIS Feature Server URL for ${result.title}`,
         url: result.url
       });
@@ -79,7 +79,7 @@ const SearchResults: React.FC = () => {
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-semibold text-gray-800">
-            Results for {currentSearch?.location}, {currentSearch?.state}
+            Results for {currentSearch?.county}, {currentSearch?.state}
           </h3>
           <span className="text-sm text-gray-500 flex items-center">
             <Clock className="h-4 w-4 mr-1" />

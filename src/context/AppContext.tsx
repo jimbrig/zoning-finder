@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AIProvider, SearchHistory, SearchResult, SearchParams, SearchStatus } from '../types';
 import { defaultProviders } from '../data/providers';
 
@@ -69,7 +69,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Mock result based on the example from the prompt
-      if (params.state.toLowerCase() === 'georgia' && params.location.toLowerCase() === 'forsyth') {
+      if (params.state.toLowerCase() === 'georgia' && params.county.toLowerCase() === 'forsyth') {
         const mockResult: SearchResult = {
           id: Date.now().toString(),
           url: 'https://geo.forsythco.com/gisworkflow/rest/services/Public/Zoning_Districts/FeatureServer',
@@ -86,7 +86,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
         const historyEntry: SearchHistory = {
           id: Date.now().toString(),
           state: params.state,
-          location: params.location,
+          county: params.county,
           timestamp: new Date().toISOString(),
           results: [mockResult]
         };

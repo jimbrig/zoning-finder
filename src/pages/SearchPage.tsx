@@ -9,7 +9,7 @@ const SearchPage: React.FC = () => {
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Find Zoning District Feature Servers</h1>
           <p className="text-gray-600">
-            Enter a state and location to find the official ArcGIS ESRI feature server URL for zoning district layers.
+            Enter a state and county to find the official ArcGIS ESRI feature server URL for zoning district layers.
           </p>
         </div>
         

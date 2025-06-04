@@ -20,7 +20,7 @@ const HelpPage: React.FC = () => {
           
           <div className="prose max-w-none">
             <p>
-              ArcGIS URL Finder helps you locate the correct feature server URLs for zoning district layers by state and location. 
+              ArcGIS URL Finder helps you locate the correct feature server URLs for zoning district layers by state and county. 
               These URLs are essential for developers, planners, and GIS professionals who need to integrate zoning data into their applications.
             </p>
             
@@ -31,7 +31,7 @@ const HelpPage: React.FC = () => {
             
             <ol className="space-y-3 list-decimal pl-5">
               <li>Enter the state name in the "State" field (autocomplete will help you select valid states)</li>
-              <li>Enter the city, county, or municipality name in the location field</li>
+              <li>Enter the county name in the "County" field</li>
               <li>Click the "Search" button to begin the search process</li>
               <li>Our AI agent will search multiple sources to find the most accurate URL for your specified location</li>
               <li>Results will display with confidence scores and validated indicators for the most reliable sources</li>
@@ -107,9 +107,9 @@ const HelpPage: React.FC = () => {
             </div>
             
             <div>
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Why can't I find a URL for my location?</h3>
+              <h3 className="text-lg font-medium text-gray-800 mb-2">Why can't I find a URL for my county?</h3>
               <p className="text-gray-600">
-                Not all municipalities publish their zoning data through ArcGIS feature servers, or they may use different naming conventions. 
+                Not all counties publish their zoning data through ArcGIS feature servers, or they may use different naming conventions. 
                 Try searching for broader terms like "planning" or "land use" if zoning-specific searches don't yield results.
               </p>
             </div>
