@@ -17,7 +17,7 @@ const SearchForm: React.FC = () => {
     if (state.trim() === '') {
       setFilteredStates([]);
     } else {
-      const filtered = statesList.filter(s => 
+      const filtered = statesList.filter((s: string) => 
         s.toLowerCase().includes(state.toLowerCase())
       );
       setFilteredStates(filtered);

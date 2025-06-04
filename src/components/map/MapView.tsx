@@ -7,9 +7,8 @@ import { Icon } from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Fix the Leaflet icon configuration
-let DefaultIcon = new Icon.Default();
-DefaultIcon.options.imagePath = ''; // This is the correct way to set it
+let DefaultIcon = Icon.Default.prototype;
+DefaultIcon.imagePath = '';
 Icon.Default.mergeOptions({
   iconUrl: icon,
   shadowUrl: iconShadow
@@ -54,12 +53,13 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
 
         setGeoJsonData(data);
 
-        // Extract unique zoning districts
+        // Extract unique zoning districts and ensure they're typed as strings
         const districts = [...new Set(
           data.features
             .map((f: any) => f.properties?.ZONING_DISTRICT || f.properties?.zoning_district)
             .filter(Boolean)
-        )];
+        )] as string[];
+        
         setZoningDistricts(districts);
 
         // Calculate bounds
