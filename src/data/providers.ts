@@ -1,5 +1,6 @@
 import { AIProvider } from '../types';
 
+// List of all US states for the dropdown
 export const statesList = [
   'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 
   'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 
@@ -13,26 +14,27 @@ export const statesList = [
   'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
 ];
 
+// Default AI providers configuration
 export const defaultProviders: AIProvider[] = [
   {
     id: 'openai',
     name: 'OpenAI',
-    description: 'Uses GPT-4 to search for ArcGIS URLs based on location information',
+    description: 'Use OpenAI GPT models to search for ArcGIS URLs',
     apiKeyRequired: true,
     enabled: true
   },
   {
-    id: 'esri',
-    name: 'ESRI API',
-    description: 'Uses ESRI REST API to directly query available services',
-    apiKeyRequired: false,
-    enabled: true
-  },
-  {
-    id: 'googleai',
-    name: 'Google AI',
-    description: 'Uses Google AI models to search for zoning information',
+    id: 'azure',
+    name: 'Azure AI',
+    description: 'Microsoft Azure AI service for geospatial data search',
     apiKeyRequired: true,
     enabled: false
+  },
+  {
+    id: 'local',
+    name: 'Local Database',
+    description: 'Search a curated database of known zoning district URLs',
+    apiKeyRequired: false,
+    enabled: true
   }
 ];
