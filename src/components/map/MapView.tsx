@@ -7,8 +7,7 @@ import { Icon } from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-// Set up the default icon for Leaflet
-Icon.Default.imagePath = '';
+// Fix the TypeScript error by properly setting the icon defaults
 Icon.Default.mergeOptions({
   iconUrl: icon,
   shadowUrl: iconShadow
@@ -53,13 +52,12 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
 
         setGeoJsonData(data);
 
-        // Extract unique zoning districts and ensure they're typed as strings
+        // Extract unique zoning districts
         const districts = [...new Set(
           data.features
             .map((f: any) => f.properties?.ZONING_DISTRICT || f.properties?.zoning_district)
             .filter(Boolean)
-        )] as string[];
-        
+        )];
         setZoningDistricts(districts);
 
         // Calculate bounds
