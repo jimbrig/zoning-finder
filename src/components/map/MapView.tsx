@@ -52,12 +52,12 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
 
         setGeoJsonData(data);
 
-        // Extract unique zoning districts
+        // Extract unique zoning districts with type assertion
         const districts = [...new Set(
           data.features
-            .map((f: any) => f.properties?.ZONING_DISTRICT || f.properties?.zoning_district)
+            .map((f: any) => (f.properties?.ZONING_DISTRICT || f.properties?.zoning_district) as string)
             .filter(Boolean)
-        )];
+        )] as string[];
         setZoningDistricts(districts);
 
         // Calculate bounds

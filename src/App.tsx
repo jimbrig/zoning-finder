@@ -1,4 +1,3 @@
-import React from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import { Map, HelpCircle, History, Home } from 'lucide-react';
 import SearchPage from './pages/SearchPage';
