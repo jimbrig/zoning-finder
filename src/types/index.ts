@@ -1,6 +1,6 @@
 export interface SearchParams {
   state: string;
-  county: string;
+  location: string;
 }
 
 export interface AIProvider {
@@ -28,7 +28,7 @@ export interface SearchResult {
 export interface SearchHistory {
   id: string;
   state: string;
-  county: string;
+  location: string;
   timestamp: string;
   results: SearchResult[];
 }

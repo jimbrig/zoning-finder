@@ -19,8 +19,8 @@ const HistoryList: React.FC = () => {
     );
   }
   
-  const handleSearchAgain = (state: string, county: string) => {
-    startSearch({ state, county });
+  const handleSearchAgain = (state: string, location: string) => {
+    startSearch({ state, location });
     navigate('/');
   };
   
@@ -38,7 +38,7 @@ const HistoryList: React.FC = () => {
               <div className="flex items-center">
                 <MapPin className="h-5 w-5 text-primary-500 mr-2" />
                 <h3 className="text-lg font-medium text-gray-800">
-                  {entry.county}, {entry.state}
+                  {entry.location}, {entry.state}
                 </h3>
               </div>
               
@@ -84,7 +84,7 @@ const HistoryList: React.FC = () => {
             <div className="flex justify-between items-center mt-3">
               <button
                 type="button"
-                onClick={() => handleSearchAgain(entry.state, entry.county)}
+                onClick={() => handleSearchAgain(entry.state, entry.location)}
                 className="flex items-center text-sm text-primary-600 hover:text-primary-800 transition-colors"
               >
                 <Search className="h-4 w-4 mr-1" />
