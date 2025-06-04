@@ -22,6 +22,39 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
   const [geoJsonData, setGeoJsonData] = useState<any>(null);
   const [bounds, setBounds] = useState<[[number, number], [number, number]] | null>(null);
 
+  // Helper function to extract coordinates from any GeoJSON geometry
+  const extractCoordinates = (geometry: any): number[][] => {
+    if (!geometry || !geometry.type || !geometry.coordinates) {
+      return [];
+    }
+
+    switch (geometry.type) {
+      case 'Point':
+        return [geometry.coordinates];
+      case 'LineString':
+        return geometry.coordinates;
+      case 'Polygon':
+        return geometry.coordinates.flat();
+      case 'MultiPoint':
+        return geometry.coordinates;
+      case 'MultiLineString':
+        return geometry.coordinates.flat();
+      case 'MultiPolygon':
+        return geometry.coordinates.flat(2);
+      default:
+        return [];
+    }
+  };
+
+  // Helper function to validate coordinate
+  const isValidCoordinate = (coord: number[]): boolean => {
+    return coord.length >= 2 &&
+           !isNaN(coord[0]) && !isNaN(coord[1]) &&
+           isFinite(coord[0]) && isFinite(coord[1]) &&
+           coord[0] >= -180 && coord[0] <= 180 &&
+           coord[1] >= -90 && coord[1] <= 90;
+  };
+
   useEffect(() => {
     const fetchGeoJson = async () => {
       try {
@@ -32,21 +65,25 @@ const MapPreview: React.FC<MapPreviewProps> = ({ url }) => {
 
         // Calculate bounds from features
         if (data.features && data.features.length > 0) {
-          let minLat = Infinity, maxLat = -Infinity;
-          let minLng = Infinity, maxLng = -Infinity;
+          let validCoordinates: number[][] = [];
 
+          // Extract and validate coordinates from all features
           data.features.forEach((feature: any) => {
-            if (feature.geometry && feature.geometry.coordinates) {
-              feature.geometry.coordinates[0].forEach((coord: number[]) => {
-                minLng = Math.min(minLng, coord[0]);
-                maxLng = Math.max(maxLng, coord[0]);
-                minLat = Math.min(minLat, coord[1]);
-                maxLat = Math.max(maxLat, coord[1]);
-              });
+            if (feature.geometry) {
+              const coords = extractCoordinates(feature.geometry);
+              validCoordinates.push(...coords.filter(isValidCoordinate));
             }
           });
 
-          setBounds([[minLat, minLng], [maxLat, maxLng]]);
+          // Only set bounds if we have valid coordinates
+          if (validCoordinates.length > 0) {
+            const minLat = Math.min(...validCoordinates.map(c => c[1]));
+            const maxLat = Math.max(...validCoordinates.map(c => c[1]));
+            const minLng = Math.min(...validCoordinates.map(c => c[0]));
+            const maxLng = Math.max(...validCoordinates.map(c => c[0]));
+
+            setBounds([[minLat, minLng], [maxLat, maxLng]]);
+          }
         }
       } catch (error) {
         console.error('Error fetching GeoJSON data:', error);
